@@ -1,0 +1,1 @@
+worker: python3 final_fixed_bot.py
