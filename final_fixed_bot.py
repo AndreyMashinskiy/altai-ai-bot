@@ -46,8 +46,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     uid = str(update.effective_user.id)
     if uid not in user_data:
         user_data[uid] = {"role": "гость", "tasks": [], "ads": [], "reminders": []}
-    await update.message.reply_text("Привет! Я Altai.AI 🤖
-Напиши /tasks чтобы посмотреть задачи.")
+    await update.message.reply_text("Привет! Я Altai.AI 🤖\Напиши /tasks чтобы посмотреть задачи.")
 
 async def role(update: Update, context: ContextTypes.DEFAULT_TYPE):
     uid = str(update.effective_user.id)
