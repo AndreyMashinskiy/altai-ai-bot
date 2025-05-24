@@ -15,14 +15,17 @@ from nspd_services import check_kadastr_data
 import openai
 
 # Фиктивный HTTP-сервер для Render
-def dummy_server():
-    PORT = 8080
-    Handler = http.server.SimpleHTTPRequestHandler
-    with socketserver.TCPServer(("", PORT), Handler) as httpd:
-        httpd.serve_forever()
+def main():
+    threading.Thread(target=dummy_server, daemon=True).start()  # запускаем порт прямо тут
 
-threading.Thread(target=dummy_server, daemon=True).start()
+    app = ApplicationBuilder().token(TOKEN).build()
 
+    app.add_handler(CommandHandler("start", start))
+    # другие хендлеры...
+
+    print("🤖 Бот Altai.AI запущен.")
+    app.run_polling()
+    
 # Настройки
 TOKEN = "YOUR_TELEGRAM_BOT_TOKEN"
 openai.api_key = "YOUR_OPENAI_API_KEY"
