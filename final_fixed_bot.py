@@ -73,8 +73,7 @@ async def show_tasks(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def kadastr(update: Update, context: ContextTypes.DEFAULT_TYPE):
     num = " ".join(context.args)
     result = check_kadastr_data(num)
-    await update.message.reply_text(f"📍 Ответ по участку {num}:
-{result}")
+    await update.message.reply_text(f"📍 Ответ по участку {num}:\n{result}")
 
 # Запуск
 def main():
