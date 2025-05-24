@@ -73,24 +73,20 @@ async def show_tasks(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not tasks:
         await update.message.reply_text("Задач нет.")
     else:
-        await update.message.reply_text("📝 Твои задачи:\\n" + "\\n".join(f"{i+1}. {t}" for i, t in enumerate(tasks)))
+        await update.message.reply_text("📝 Твои задачи:\n" + "\n".join(f"{i+1}. {t}" for i, t in enumerate(tasks)))
 
 async def kadastr(update: Update, context: ContextTypes.DEFAULT_TYPE):
     num = " ".join(context.args)
     result = check_kadastr_data(num)
-    await update.message.reply_text(f"📍 Ответ по участку {num}:
-{result}")
+    await update.message.reply_text(f"📍 Ответ по участку {num}:\n{result}")
 
 async def market(update: Update, context: ContextTypes.DEFAULT_TYPE):
     region = " ".join(context.args)
     stats = get_market_stats(region)
     await update.message.reply_text(
-        f"📊 Статистика по региону {region}:
-"
-        f"Средняя цена: {stats['avg_price_per_sqm']}₽/м²
-"
-        f"Мин: {stats['min_price']}₽, Макс: {stats['max_price']}₽
-"
+        f"📊 Статистика по региону {region}:\n"
+        f"Средняя цена: {stats['avg_price_per_sqm']}₽/м²\n"
+        f"Мин: {stats['min_price']}₽, Макс: {stats['max_price']}₽\n"
         f"Объявлений в выборке: {stats['sample_size']}"
     )
 
