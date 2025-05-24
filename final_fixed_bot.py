@@ -18,14 +18,14 @@ def dummy_server():
         print("🔵 Фиктивный сервер на порту", PORT, "запущен")
         httpd.serve_forever()
 
-# Заглушки
+# Импорты из локальных файлов
 from avito_api import get_my_ads, get_market_stats, get_region_ads
 from nspd_services import check_kadastr_data
 import openai
 
 # Настройки
-TOKEN = "YOUR_TELEGRAM_BOT_TOKEN"
-openai.api_key = "YOUR_OPENAI_API_KEY"
+TOKEN = os.environ.get("YOUR_TELEGRAM_BOT_TOKEN")
+openai.api_key = os.environ.get("OPENAI_API_KEY")
 DATA_FILE = "data.json"
 user_data = {}
 
@@ -46,7 +46,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     uid = str(update.effective_user.id)
     if uid not in user_data:
         user_data[uid] = {"role": "гость", "tasks": [], "ads": [], "reminders": []}
-    await update.message.reply_text("Привет! Я Altai.AI 🤖\Напиши /tasks чтобы посмотреть задачи.")
+    await update.message.reply_text("Привет! Я Altai.AI 🤖\nНапиши /tasks чтобы посмотреть задачи.")
 
 async def role(update: Update, context: ContextTypes.DEFAULT_TYPE):
     uid = str(update.effective_user.id)
@@ -91,4 +91,7 @@ def main():
     app.run_polling()
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        print("❌ Ошибка при запуске бота:", e)
