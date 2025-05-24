@@ -9,23 +9,19 @@ import socketserver
 from telegram import Update, ReplyKeyboardMarkup
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, ContextTypes
 
+# Фиктивный HTTP-сервер для Render
+def dummy_server():
+    PORT = 8080
+    Handler = http.server.SimpleHTTPRequestHandler
+    with socketserver.TCPServer(("", PORT), Handler) as httpd:
+        print("🔵 Фиктивный сервер на порту 8080 запущен")
+        httpd.serve_forever()
+
 # Заглушки
 from avito_api import get_my_ads, get_market_stats, get_region_ads
 from nspd_services import check_kadastr_data
 import openai
 
-# Фиктивный HTTP-сервер для Render
-def main():
-    threading.Thread(target=dummy_server, daemon=True).start()  # запускаем порт прямо тут
-
-    app = ApplicationBuilder().token(TOKEN).build()
-
-    app.add_handler(CommandHandler("start", start))
-    # другие хендлеры...
-
-    print("🤖 Бот Altai.AI запущен.")
-    app.run_polling()
-    
 # Настройки
 TOKEN = "YOUR_TELEGRAM_BOT_TOKEN"
 openai.api_key = "YOUR_OPENAI_API_KEY"
@@ -89,6 +85,8 @@ async def kadastr(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 # Запуск
 def main():
+    threading.Thread(target=dummy_server, daemon=True).start()
+
     app = ApplicationBuilder().token(TOKEN).build()
 
     app.add_handler(CommandHandler("start", start))
