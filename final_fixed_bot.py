@@ -45,13 +45,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     uid = str(update.effective_user.id)
     if uid not in user_data:
         user_data[uid] = {"role": "гость", "tasks": [], "ads": [], "reminders": []}
-    await update.message.reply_text(
-        "👋 Привет! Я Altai.AI — твой ассистент.",
-        reply_markup=ReplyKeyboardMarkup(
-            [["🧠 План", "⏰ Напоминание"], ["📉 Инвестиции", "🏡 Объявления"], ["⚙️ Сменить роль"]],
-            one_time_keyboard=True, resize_keyboard=True
-        )
-    )
+    await update.message.reply_text("📝 Твои задачи:\n" + "\n".join(f"{i+1}. {t}" for i, t in enumerate(tasks)))
 
 async def role(update: Update, context: ContextTypes.DEFAULT_TYPE):
     uid = str(update.effective_user.id)
