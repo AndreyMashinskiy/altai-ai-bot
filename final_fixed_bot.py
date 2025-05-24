@@ -24,7 +24,7 @@ from nspd_services import check_kadastr_data
 import openai
 
 # Настройки
-TOKEN = os.environ.get("YOUR_TELEGRAM_BOT_TOKEN")
+TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
 openai.api_key = os.environ.get("OPENAI_API_KEY")
 DATA_FILE = "data.json"
 user_data = {}
