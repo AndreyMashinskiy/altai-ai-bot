@@ -68,9 +68,7 @@ async def show_tasks(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not tasks:
         await update.message.reply_text("Задач нет.")
     else:
-        await update.message.reply_text("📝 Твои задачи:
-" + "
-".join(f"{i+1}. {t}" for i, t in enumerate(tasks)))
+        await update.message.reply_text("📝 Твои задачи:\n" + "\n".join(f"{i+1}. {t}" for i, t in enumerate(tasks)))
 
 async def kadastr(update: Update, context: ContextTypes.DEFAULT_TYPE):
     num = " ".join(context.args)
