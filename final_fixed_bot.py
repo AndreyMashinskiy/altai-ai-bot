@@ -9,19 +9,17 @@ import os
 
 from telegram import Update, ReplyKeyboardMarkup
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, ContextTypes
+from avito_api import get_market_stats
+from nspd_services import check_kadastr_data
+import openai
 
 # Фиктивный HTTP-сервер для Render
 def dummy_server():
-    PORT = int(os.environ.get("PORT", 8080))
+    PORT = int(os.environ.get("PORT", 10000))
     Handler = http.server.SimpleHTTPRequestHandler
     with socketserver.TCPServer(("", PORT), Handler) as httpd:
         print("🔵 Фиктивный сервер на порту", PORT, "запущен")
         httpd.serve_forever()
-
-# Импорты из локальных файлов
-from avito_api import get_my_ads, get_market_stats, get_region_ads
-from nspd_services import check_kadastr_data
-import openai
 
 # Настройки
 TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
@@ -31,12 +29,14 @@ user_data = {}
 
 logging.basicConfig(level=logging.INFO)
 
+# Загрузка данных
 try:
     with open(DATA_FILE, "r") as f:
         user_data = json.load(f)
 except:
     user_data = {}
 
+# Сохранение
 def save_data():
     with open(DATA_FILE, "w") as f:
         json.dump(user_data, f, indent=2)
@@ -46,7 +46,12 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     uid = str(update.effective_user.id)
     if uid not in user_data:
         user_data[uid] = {"role": "гость", "tasks": [], "ads": [], "reminders": []}
-    await update.message.reply_text("Привет! Я Altai.AI 🤖\nНапиши /tasks чтобы посмотреть задачи.")
+    await update.message.reply_text(
+        "👋 Привет! Я Altai.AI — твой ассистент.",
+        reply_markup=ReplyKeyboardMarkup([["🧠 План", "⏰ Напоминание"],
+                                          ["📈 Инвестиции", "🏡 Объявления"],
+                                          ["⚙️ Сменить роль"]], resize_keyboard=True)
+    )
 
 async def role(update: Update, context: ContextTypes.DEFAULT_TYPE):
     uid = str(update.effective_user.id)
@@ -68,30 +73,40 @@ async def show_tasks(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not tasks:
         await update.message.reply_text("Задач нет.")
     else:
-        await update.message.reply_text("📝 Твои задачи:\n" + "\n".join(f"{i+1}. {t}" for i, t in enumerate(tasks)))
+        await update.message.reply_text("📝 Твои задачи:
+" + "\n".join(f"{i+1}. {t}" for i, t in enumerate(tasks)))
 
 async def kadastr(update: Update, context: ContextTypes.DEFAULT_TYPE):
     num = " ".join(context.args)
     result = check_kadastr_data(num)
-    await update.message.reply_text(f"📍 Ответ по участку {num}:\n{result}")
+    await update.message.reply_text(f"📍 Ответ по участку {num}:
+{result}")
+
+async def market(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    region = " ".join(context.args)
+    stats = get_market_stats(region)
+    await update.message.reply_text(
+        f"📊 Статистика по региону {region}:
+"
+        f"Средняя цена: {stats['avg_price_per_sqm']}₽/м²
+"
+        f"Мин: {stats['min_price']}₽, Макс: {stats['max_price']}₽
+"
+        f"Объявлений в выборке: {stats['sample_size']}"
+    )
 
 # Запуск
 def main():
     threading.Thread(target=dummy_server, daemon=True).start()
-
     app = ApplicationBuilder().token(TOKEN).build()
-
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("role", role))
     app.add_handler(CommandHandler("add_task", add_task))
     app.add_handler(CommandHandler("tasks", show_tasks))
     app.add_handler(CommandHandler("kadastr", kadastr))
-
+    app.add_handler(CommandHandler("market", market))
     print("🤖 Бот Altai.AI запущен.")
     app.run_polling()
 
 if __name__ == "__main__":
-    try:
-        main()
-    except Exception as e:
-        print("❌ Ошибка при запуске бота:", e)
+    main()
