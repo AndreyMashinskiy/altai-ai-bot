@@ -11,7 +11,7 @@ from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, fil
 
 # Фиктивный HTTP-сервер для Render
 def dummy_server():
-    PORT = 8080
+    PORT = int(os.environ.get("PORT", 8080))
     Handler = http.server.SimpleHTTPRequestHandler
     with socketserver.TCPServer(("", PORT), Handler) as httpd:
         print("🔵 Фиктивный сервер на порту 8080 запущен")
